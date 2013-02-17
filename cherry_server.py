@@ -24,24 +24,28 @@ class Content:
         if cherrypy.request.json:
             obj = cherrypy.request.json
             method = obj["method"]
+            _id = obj["id"]
+            
             if "params" in obj:
                 params = obj["params"]
-            id     = obj["id"]
+            else:
+                return json.dumps({"result" : None,"error":
+                    {"code": -32604, "message": "Params empty"}, "id": _id})
+            
             # process the data
             cherrypy.response.headers['Content-Type']= 'text/json-comment-filtered'
             result = None
             if method == "initialize":
                 result = self.population.initialize()
-                return json.dumps({"result" : result,"error": None, "id": id})
+                return json.dumps({"result" : result,"error": None, "id": _id})
 
             if method == "getSample":
                 result = self.population.get_sample(params[0])
-                print result
                 if result:
-                    return json.dumps({"result" : result,"error": None, "id": id})
+                    return json.dumps({"result" : result,"error": None, "id": _id})
                 else:
                     return json.dumps({"result" : None,"error":
-                        {"code": -32601, "message": "EvoSpace empty"}, "id": id})
+                        {"code": -32601, "message": "EvoSpace empty"}, "id": _id})
             elif method == "respawn":
                 result = self.population.respawn(params[0])
             elif method == "putSample":
@@ -50,8 +54,13 @@ class Content:
                 result = self.population.put_individual(**params[0])
             elif method == "size":
                 result = self.population.size()
-            print json.dumps({"result" : result,"error": None, "id": id})
-            return json.dumps({"result" : result,"error": None, "id": id})
+            elif method == "found":
+                result = self.population.found()
+            elif method == "found_it":
+                result = self.population.found_it()
+
+
+            return json.dumps({"result" : result,"error": None, "id": _id})
 
         else:
             print "blah"
