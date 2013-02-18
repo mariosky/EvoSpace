@@ -175,7 +175,7 @@ class Population:
 
 
     def found(self):
-        r.get(self.name+":found")
+        return r.get(self.name+":found")
 
 
     def found_it(self):
