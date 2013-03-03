@@ -7,7 +7,7 @@ LOCAL = False
 import os, redis, random
 
 
-redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+redis_url = os.getenv('REDISCLOUD_URL', 'redis://localhost:6379')
 r = redis.from_url(redis_url)
 
 #r = redis.Redis(host=HOST, port=PORT, db=DB)
