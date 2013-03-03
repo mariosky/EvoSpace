@@ -6,10 +6,16 @@ LOCAL = False
 
 import os, redis, random
 
+##REDISCLOUD
+import urlparse
+url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
 
-redis_url = os.getenv('REDISCLOUD_URL', 'redis://localhost:6379')
-r = redis.from_url(redis_url)
+##REDISTOGO
+#redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
+#r = redis.from_url(redis_url)
 
+##Local
 #r = redis.Redis(host=HOST, port=PORT, db=DB)
 
 class Individual:
