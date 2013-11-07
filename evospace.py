@@ -4,6 +4,9 @@ LOGGING = False
 LOG_INTERVAL = 10
 LOCAL = False
 
+MIN_SIZE = 128
+RE_INSERT_SAMPLES = 8
+
 import os, redis, random
 
 ##REDISCLOUD
