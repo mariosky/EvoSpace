@@ -6,20 +6,29 @@ LOCAL = False
 
 MIN_SIZE = 128
 RE_INSERT_SAMPLES = 8
+AUTO_RESPAWN = True
+
+HOST="127.0.0.1"
+PORT=6379
 
 import os, redis, random
 
 ##REDISCLOUD
 import urlparse
-url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
-r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
+
+if os.environ.get('REDISCLOUD_URL'):
+    url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+    r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
+else:
+    r = redis.Redis(host=HOST, port=PORT)
+
 
 ##REDISTOGO
 #redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
 #r = redis.from_url(redis_url)
 
 ##Local
-#r = redis.Redis(host=HOST, port=PORT, db=DB)
+
 
 class Individual:
     def __init__(self, **kwargs):
@@ -92,10 +101,15 @@ class Population:
 
 
     def get_sample(self, size):
+
+        if AUTO_RESPAWN and r.scard(self.name) <= MIN_SIZE:
+            self.respawn(RE_INSERT_SAMPLES)
+
         sample_id = r.incr(self.sample_counter)
 
         #Get keys
         sample = [r.spop(self.name) for i in range(size)]
+
         #If there is a None
         if None in sample:
             sample = [s for s in sample if s]
