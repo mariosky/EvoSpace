@@ -5,7 +5,7 @@ import cherrypy
 
 from cherrypy._cpcompat import ntou
 
-import  json, os
+import json,os
 
 
 
@@ -81,6 +81,7 @@ if __name__ == '__main__':
         ,'server.environment':  'production'
         ,'server.thread_pool':   200
         ,'tools.sessions.on':    False
+        ,'server.socket_timeout': 30
     })
 
     from cherrypy.process import servers

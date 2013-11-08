@@ -204,6 +204,8 @@ class Population:
     def found_it(self):
         r.set(self.name+":found",1)
 
+
+
 def init_pop( populationSize, rangemin = 0 ,rangemax = 11, listSize = 66):
     server = Population("pop")
     server.initialize()
@@ -211,6 +213,7 @@ def init_pop( populationSize, rangemin = 0 ,rangemax = 11, listSize = 66):
         chrome = [random.randint(rangemin,rangemax) for _ in range(listSize)]
         individual = {"id":None,"fitness":{"DefaultContext":0.0 },"chromosome":chrome}
         server.put_individual(**individual)
+
 
 if __name__ == "__main__":
     init_pop(100)
