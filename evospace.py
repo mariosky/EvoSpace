@@ -8,6 +8,9 @@ MIN_SIZE = 128
 RE_INSERT_SAMPLES = 8
 AUTO_RESPAWN = True
 
+#RESPAWN='REINSERT'
+RESPAWN='RANDOM'
+
 HOST="127.0.0.1"
 PORT=6379
 
@@ -19,15 +22,11 @@ import urlparse
 if os.environ.get('REDISCLOUD_URL'):
     url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
     r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
+#LOCAL
 else:
     r = redis.Redis(host=HOST, port=PORT)
 
 
-##REDISTOGO
-#redis_url = os.getenv('REDISTOGO_URL', 'redis://localhost:6379')
-#r = redis.from_url(redis_url)
-
-##Local
 
 
 class Individual:
@@ -181,6 +180,8 @@ class Population:
             r.lrem(self.sample_queue,sample_id,1)
 
 
+
+
     def respawn_ratio(self, ratio = .2):
         until_sample  = int(r.llen(self.sample_queue)*ratio)
         for i in range(until_sample):
@@ -188,29 +189,43 @@ class Population:
 
 
     def respawn(self, n = 1):
-        current_size = r.llen(self.sample_queue)
-        if n > current_size:
-            for i in range(current_size):
-                self.respawn_sample( r.lpop(self.sample_queue))
-        else:
-            for i in range(n):
-                self.respawn_sample( r.lpop(self.sample_queue))
-
+        if RESPAWN == 'REINSERT':
+            current_size = r.llen(self.sample_queue)
+            if n > current_size:
+                for i in range(current_size):
+                    self.respawn_sample( r.lpop(self.sample_queue))
+            else:
+                for i in range(n):
+                    self.respawn_sample( r.lpop(self.sample_queue))
+        elif RESPAWN == 'RANDOM':
+            dummy_sample = [{"chromosome":ind[:], "id":None, "fitness":{"DefaultContext":0.0}} for ind in get_peaks(n*16,512)]
+            for member in dummy_sample:
+                member['id'] = self.name+":individual:%s" % r.incr(self.individual_counter)
+                self.put_individual(**member)
 
     def found(self):
         return r.get(self.name+":found")
-
 
     def found_it(self):
         r.set(self.name+":found",1)
 
 
 
-def init_pop( populationSize, rangemin = 0 ,rangemax = 11, listSize = 66):
+##
+##  Just for RANDOM experiment
+##
+##
+
+def get_peaks(number, bits, seed = None):
+    if seed:
+        random.seed(seed)
+    return [[random.randint(0,1) for _ in range(bits)] for _ in range(number)]
+
+def init_pop( populationSize, bits = 512):
     server = Population("pop")
     server.initialize()
     for individual in range(populationSize):
-        chrome = [random.randint(rangemin,rangemax) for _ in range(listSize)]
+        chrome = [random.randint(0,1) for _ in range(bits)]
         individual = {"id":None,"fitness":{"DefaultContext":0.0 },"chromosome":chrome}
         server.put_individual(**individual)
 
