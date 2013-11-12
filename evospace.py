@@ -198,7 +198,7 @@ class Population:
                 for i in range(n):
                     self.respawn_sample( r.lpop(self.sample_queue))
         elif RESPAWN == 'RANDOM':
-            dummy_sample = [{"chromosome":ind[:], "id":None, "fitness":{"DefaultContext":0.0}} for ind in get_peaks(n*16,512)]
+            dummy_sample = [{"chromosome":ind[:], "id":None, "fitness":{"DefaultContext":0.0}} for ind in get_peaks(n*16,256)]
             for member in dummy_sample:
                 member['id'] = self.name+":individual:%s" % r.incr(self.individual_counter)
                 self.put_individual(**member)
@@ -221,7 +221,7 @@ def get_peaks(number, bits, seed = None):
         random.seed(seed)
     return [[random.randint(0,1) for _ in range(bits)] for _ in range(number)]
 
-def init_pop( populationSize, bits = 512):
+def init_pop( populationSize, bits = 256):
     server = Population("pop")
     server.initialize()
     for individual in range(populationSize):
