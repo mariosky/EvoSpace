@@ -19,8 +19,8 @@ import os, redis, random
 ##REDISCLOUD
 import urlparse
 
-if os.environ.get('REDISCLOUD_URL'):
-    url = urlparse.urlparse(os.environ.get('REDISCLOUD_URL'))
+if os.environ.get('REDISTOGO_URL'):
+    url = urlparse.urlparse(os.environ.get('REDISTOGO_URL'))
     r = redis.Redis(host=url.hostname, port=url.port, password=url.password)
 #LOCAL
 else:
