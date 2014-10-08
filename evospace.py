@@ -92,7 +92,12 @@ class Population:
 
 
     def initialize(self):
-        r.flushall()
+        pattern = "%s*" % self.name
+        keys = r.keys(pattern)
+        if keys:
+            r.delete(*keys)
+
+        #r.flushall()
         r.setnx(self.sample_counter,0)
         r.setnx(self.individual_counter,0)
         r.setnx(self.returned_counter,0)
